@@ -1,8 +1,8 @@
 #! bin/bash/
 #
 # Description: Copies and runs automation script on GCP remote server
-# Author: Ben Burchfield
-# Date: 17 April 2024
+# Author: Noah Herron
+# Date: 27 April 2024
 
 strIP=$1
 strTicketID=$2
