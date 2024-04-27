@@ -25,8 +25,12 @@ echo ${arrResults}
 # getting the length and setting it to intLength
 intLength=$(echo ${arrResults} | jq "length")
 # debug to test length
-echo ${intLength}
+#echo ${intLength}
+
+# index to move throught the array in json
 intIndex=0
+# secondary index
+intSecIndex=0
 
 # setting the date
 strStartDate=$(date +"%d-%b-%Y %R")
@@ -34,8 +38,27 @@ strStartDate=$(date +"%d-%b-%Y %R")
 echo ${strStartDate}
 
 while [ $intIndex -lt $intLength ]; do
+	intTickID=$(echo ${arrResults} |jq .[${intIndex}].ticketID)
+	# debug to test strPackLength
+	echo ${strPackLength}
+
 	# getting the requestors name
-	strReqName=$(echo ${arrResults} | jq .[intIndex].requestor)
+	strReqName=$(echo ${arrResults} | jq .[${intIndex}].requestor)
+
 	# debug statment to make sure requestor name is correct
 	echo ${strReqName}
+
+	# getting the requestors name
+	strconfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
+
+	# debug statment to make sure Config name is correct
+	echo ${strConfig}
+
+	strSoftwarePackages=$(echo "$arrResults" | jq -r .[$intIndex].softwarePackages)
+	numPackages=$(echo "$strSoftwarePackages" | jq length)
+	# debug to test number of packages is correct
+	echo ${numPackages}
+
+
+	((intIndex++))
 done
