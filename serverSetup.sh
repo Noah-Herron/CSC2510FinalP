@@ -73,6 +73,33 @@ while [ $intIndex -lt $intLength ]; do
 
                 	((intSecIndex++))
         	done
+
+		# Making the log directory
+		mkdir /configurationLogs
+
+		# Making the log file
+		touch $intTicketID
+
+		# Adding the logs to the log file
+		echo "TicketID: ${intTicketID}"
+		echo "Start DateTime: ${strStartDate}"
+		echo "Requestor: ${strReqName}"
+		echo "External IP: ${}"
+		echo "Hostname: ${strHostName}"
+		echo "Standard Configuration: ${strConfig}"
+		echo ""
+		echo "SoftwarePackage - ${strPackage} - TIME STAMP"
+		echo ""
+		echo "Version Check - ${strPackage} - VERSION"
+		echo ""
+		echo "TicketClosed"
+
+		strEndDate=$(date +"%d-%b-%Y %R")
+		# debug to test end date
+		echo ${strEndDate}
+
+		echo "Completed: ${strEndDate}"
+
 	fi
 
         ((intIndex++))
