@@ -44,11 +44,15 @@ while [ $intIndex -lt $intLength ]; do
 
 	        # getting the requestors name
         	strReqName=$(echo ${arrResults} | jq .[${intIndex}].requestor)
+			# removing the parenthases around the requestors name
+			strReqName=${strReqName:1:-1}
 	        # debug statment to make sure requestor name is correct
-        	#echo ${strReqName}
+        	echo ${strReqName}
 
         	# getting the requestors name
 	        strconfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
+			# removing the parenthases around the strConfig
+			strConfig=${strConfig:1:-1}
         	# debug statment to make sure Config name is correct
         	#echo ${strConfig}
 
@@ -75,16 +79,16 @@ while [ $intIndex -lt $intLength ]; do
         	done
 
 		# Making the log directory
-		mkdir /configurationLogs
+		mkdir ~/configurationLogs
 
 		# Making the log file
 		touch $intTicketID
 
 		# Adding the logs to the log file
-		echo "TicketID: ${intTicketID}"
+		echo "TicketID: ${intTickID}"
 		echo "Start DateTime: ${strStartDate}"
 		echo "Requestor: ${strReqName}"
-		echo "External IP: ${}"
+		echo "External IP: ${gcpIP}"
 		echo "Hostname: ${strHostName}"
 		echo "Standard Configuration: ${strConfig}"
 		echo ""
