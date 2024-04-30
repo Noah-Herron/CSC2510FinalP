@@ -32,7 +32,7 @@ intIndex=0
 # secondary index
 intSecIndex=0
 # third index for while loop version
-intThriIndex=0
+intThirIndex=0
 
 # setting the date
 strStartDate=$(date +"%d-%b-%Y %R")
@@ -86,35 +86,39 @@ while [ $intIndex -lt $intLength ]; do
 		# debug to test if host name is correct
 		#echo ${strHostName}
 		while [ $intSecIndex -lt $numPackages ]; do
-				strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
-				#echo ${strPackage}
-				# removing the parenthases from th string
-				strPackage=${strPackage:1:-1}
-				# debug testing if correctly removed the parenthases
-				#echo $strPackage
-				sudo apt-get update
-				sudo apt-get install $strPackage -y
+			strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
+			#echo ${strPackage}
+			# removing the parenthases from th string
+			strPackage=${strPackage:1:-1}
+			# debug testing if correctly removed the parenthases
+			#echo $strPackage
+			sudo apt-get update
+			sudo apt-get install $strPackage -y
 
-				# Adding the message below to the corresponding log file
-				echo "SoftwarePackage - ${strPackage} - TIME STAMP" >> configurationLogs/${ticketID}.log
+			# epoch time of the download
+			#strEpochDownload=$(date +"%s")
+			# debug to test strEpochDownload
+			echo ${strEpochDownload}
+			# Adding the message below to the corresponding log file
+			echo "SoftwarePackage - ${strPackage} - ${strEpochDownload}" >> configurationLogs/${ticketID}.log
 
-				((intSecIndex++))
+			((intSecIndex++))
 		done
 
 		echo "" >> configurationLogs/${ticketID}.log
 		
-		while [ $intThriIndex -lt $numPackages ]; do
-				strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
-				#echo ${strPackage}
-				# removing the parenthases from th string
-				strPackage=${strPackage:1:-1}
-				# debug testing if correctly removed the parenthases
-				#echo $strPackage
-				echo dpkg -s $strPackage | grep -i version
-				# Adding the version of each software Package to the log file
-				echo "Version Check - ${strPackage} - VERSION" >> configurationLogs/${ticketID}.log
+		while [ $intThirIndex -lt $numPackages ]; do
+			strPackage=$(echo ${strSoftwarePackages} | jq .[${intThirIndex}].install)
+			#echo ${strPackage}
+			# removing the parenthases from th string
+			strPackage=${strPackage:1:-1}
+			# debug testing if correctly removed the parenthases
+			#echo $strPackage
+			strVer=$(dpkg -s $strPackage | grep -i version)
+			# Adding the version of each software Package to the log file
+			echo "Version Check - ${strPackage} - ${strVer}" >> configurationLogs/${ticketID}.log
 
-				((intThirIndex++))
+			((intThirIndex++))
 		done
 		# End of the Log file
 		echo "" >> configurationLogs/${ticketID}.log
