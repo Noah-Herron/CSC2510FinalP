@@ -20,7 +20,7 @@ strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 # Getting the json form the URL
 arrResults=$(curl ${strURL} | jq)
 # debug statement to test if arrResults is correct
-echo ${arrResults}
+#echo ${arrResults}
 
 # getting the length and setting it to intLength
 intLength=$(echo ${arrResults} | jq "length")
@@ -31,78 +31,100 @@ intLength=$(echo ${arrResults} | jq "length")
 intIndex=0
 # secondary index
 intSecIndex=0
+# third index for while loop version
+intThriIndex=0
 
 # setting the date
 strStartDate=$(date +"%d-%b-%Y %R")
 #debug to make sure date is correct
-echo ${strStartDate}
+#echo ${strStartDate}
 
 while [ $intIndex -lt $intLength ]; do
         intTickID=$(echo ${arrResults} | jq .[${intIndex}].ticketID)
+		# debug to ensure intTickID is correct
+		#echo ${intTickID}
 
 	if [ $intTickID = $ticketID ]; then
 
-	        # getting the requestors name
-        	strReqName=$(echo ${arrResults} | jq .[${intIndex}].requestor)
-			# removing the parenthases around the requestors name
-			strReqName=${strReqName:1:-1}
-	        # debug statment to make sure requestor name is correct
-        	echo ${strReqName}
+		# getting the requestors name
+		strReqName=$(echo ${arrResults} | jq .[${intIndex}].requestor)
+		# removing the parenthases around the requestors name
+		strReqName=${strReqName:1:-1}
+		# debug statment to make sure requestor name is correct
+		#echo ${strReqName}
 
-        	# getting the requestors name
-	        strconfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
-			# removing the parenthases around the strConfig
-			strConfig=${strConfig:1:-1}
-        	# debug statment to make sure Config name is correct
-        	#echo ${strConfig}
+		# getting the requestors name
+		strconfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
+		# removing the parenthases around the strConfig
+		strConfig=${strConfig:1:-1}
+		# debug statment to make sure Config name is correct
+		#echo ${strConfig}
 
-        	strSoftwarePackages=$(echo "$arrResults" | jq -r .[${intIndex}].softwarePackages)
-        	numPackages=$(echo "$strSoftwarePackages" | jq length)
-        	# debug to test number of packages is correct
-        	echo ${numPackages}
+		strSoftwarePackages=$(echo "$arrResults" | jq -r .[${intIndex}].softwarePackages)
+		numPackages=$(echo "$strSoftwarePackages" | jq length)
+		# debug to test number of packages is correct
+		#echo ${numPackages}
 
-	        strHostName=$(whoami)
+		strHostName=$(whoami)
 
-        	# debug to test if host name is correct
-         	#echo ${strHostName}
-        	while [ $intSecIndex -lt $numPackages ]; do
-                	strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
-                	#echo ${strPackage}
-                	# removing the parenthases from th string
-                	strPackage=${strPackage:1:-1}
-                	# debug testing if correctly removed the parenthases
-                	#echo $strPackage
-                	sudo apt-get update
-                	sudo apt-get install $strPackage -y
-
-                	((intSecIndex++))
-        	done
 
 		# Making the log directory
-		mkdir ~/configurationLogs
+		mkdir configurationLogs
 
 		# Making the log file
-		touch $intTicketID
+		#touch $ticketID configurationLogs/${ticketID}.log
 
 		# Adding the logs to the log file
-		echo "TicketID: ${intTickID}"
-		echo "Start DateTime: ${strStartDate}"
-		echo "Requestor: ${strReqName}"
-		echo "External IP: ${gcpIP}"
-		echo "Hostname: ${strHostName}"
-		echo "Standard Configuration: ${strConfig}"
-		echo ""
-		echo "SoftwarePackage - ${strPackage} - TIME STAMP"
-		echo ""
-		echo "Version Check - ${strPackage} - VERSION"
-		echo ""
-		echo "TicketClosed"
+		echo "TicketID: ${ticketID}" >> configurationLogs/${ticketID}.log
+		echo "Start DateTime: ${strStartDate}" >> configurationLogs/${ticketID}.log
+		echo "Requestor: ${strReqName}" >> configurationLogs/${ticketID}.log
+		echo "External IP: ${gcpIP}" >> configurationLogs/${ticketID}.log
+		echo "Hostname: ${strHostName}" >> configurationLogs/${ticketID}.log
+		echo "Standardconfiguration: ${strConfig}" >> configurationLogs/${ticketID}.log
+		echo "" >> configurationLogs/${ticketID}.log
+
+		# debug to test if host name is correct
+		#echo ${strHostName}
+		while [ $intSecIndex -lt $numPackages ]; do
+				strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
+				#echo ${strPackage}
+				# removing the parenthases from th string
+				strPackage=${strPackage:1:-1}
+				# debug testing if correctly removed the parenthases
+				#echo $strPackage
+				sudo apt-get update
+				sudo apt-get install $strPackage -y
+
+				# Adding the message below to the corresponding log file
+				echo "SoftwarePackage - ${strPackage} - TIME STAMP" >> configurationLogs/${ticketID}.log
+
+				((intSecIndex++))
+		done
+
+		echo "" >> configurationLogs/${ticketID}.log
+		
+		while [ $intThriIndex -lt $numPackages ]; do
+				strPackage=$(echo ${strSoftwarePackages} | jq .[${intSecIndex}].install)
+				#echo ${strPackage}
+				# removing the parenthases from th string
+				strPackage=${strPackage:1:-1}
+				# debug testing if correctly removed the parenthases
+				#echo $strPackage
+				echo dpkg -s $strPackage | grep -i version
+				# Adding the version of each software Package to the log file
+				echo "Version Check - ${strPackage} - VERSION" >> configurationLogs/${ticketID}.log
+
+				((intThirIndex++))
+		done
+		# End of the Log file
+		echo "" >> configurationLogs/${ticketID}.log
+		echo "TicketClosed" >> configurationLogs/${ticketID}.log
 
 		strEndDate=$(date +"%d-%b-%Y %R")
 		# debug to test end date
-		echo ${strEndDate}
+		#echo ${strEndDate}
 
-		echo "Completed: ${strEndDate}"
+		echo "Completed: ${strEndDate}" >> configurationLogs/${ticketID}.log
 
 	fi
 
