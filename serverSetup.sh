@@ -50,7 +50,7 @@ strStartDate=$(date +"%d-%b-%Y %R")
 #echo ${strStartDate}
 
 while [ $intIndex -lt $intLength ]; do
-        intTickID=$(echo ${arrResults} | jq .[${intIndex}].ticketID)
+		intTickID=$(echo ${arrResults} | jq .[${intIndex}].ticketID)
 		# debug to ensure intTickID is correct
 		#echo ${intTickID}
 
@@ -124,7 +124,6 @@ while [ $intIndex -lt $intLength ]; do
 		numConfigs=$(echo "$strConfigs" | jq length)
 
 		while [ $intConfigIndex -lt $numConfigs ]; do
-
 			# getting epoch time at the start of the download
 			strEpoch=$(date +"%s")
 			strConfigName=$(echo ${strConfigs} | jq .[${intConfigIndex}].name)
@@ -138,14 +137,14 @@ while [ $intIndex -lt $intLength ]; do
 			strConfig=${strConfig:1:-1}
 			# debug testing if correctly removed the parenthases
 			#echo $strConfig
-			
+
 			# getting the path to the specified file, and creating directories to get there if needed
 			if [[ $strConfig == *"touch"* ]]; then
-                strPath=$(echo ${strConfig})
-                strPath=$(echo $(echo ${strPath}) | sed -e 's/touch //')
-                strPath=$(echo $(echo ${strPath}) | sed -e 's![^/]*$!!')
-                eval $(sudo mkdir -p ${strPath})
-            fi
+				strPath=$(echo ${strConfig})
+				strPath=$(echo $(echo ${strPath}) | sed -e 's/touch //')
+				strPath=$(echo $(echo ${strPath}) | sed -e 's![^/]*$!!')
+				eval $(sudo mkdir -p ${strPath})
+			fi
 
 			# executing the specified config command
 			eval $(sudo ${strConfig})
@@ -157,7 +156,7 @@ while [ $intIndex -lt $intLength ]; do
 		done
 
 		echo "" >> configurationLogs/${ticketID}.log
-		
+
 		while [ $intThirIndex -lt $numPackages ]; do
 			strPackage=$(echo ${strSoftwarePackages} | jq .[${intThirIndex}].install)
 			#echo ${strPackage}
@@ -184,7 +183,7 @@ while [ $intIndex -lt $intLength ]; do
 
 	fi
 
-        ((intIndex++))
+		((intIndex++))
 done
 
 
