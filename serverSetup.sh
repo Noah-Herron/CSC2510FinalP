@@ -14,6 +14,9 @@ gcpIP=$1
 # The ticket ID to be processed
 ticketID=$2
 
+sudo apt-get update
+sudo apt-get install jq -y
+
 # Getting URL of the web service
 strURL="https://www.swollenhippo.com/ServiceNow/systems/devTickets.php"
 
@@ -54,7 +57,7 @@ while [ $intIndex -lt $intLength ]; do
 		#echo ${strReqName}
 
 		# getting the requestors name
-		strconfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
+		strConfig=$(echo ${arrResults} | jq .[${intIndex}].standardConfig)
 		# removing the parenthases around the strConfig
 		strConfig=${strConfig:1:-1}
 		# debug statment to make sure Config name is correct
@@ -65,7 +68,7 @@ while [ $intIndex -lt $intLength ]; do
 		# debug to test number of packages is correct
 		#echo ${numPackages}
 
-		strHostName=$(whoami)
+		strHostName=$(hostname)
 
 
 		# Making the log directory
@@ -92,13 +95,16 @@ while [ $intIndex -lt $intLength ]; do
 			strPackage=${strPackage:1:-1}
 			# debug testing if correctly removed the parenthases
 			#echo $strPackage
+
 			sudo apt-get update
+
+			# epoch time when download starts
+			strEpochDownload=$(date +"%s")
+			# debug to test strEpochDownload
+			#echo ${strEpochDownload}
+
 			sudo apt-get install $strPackage -y
 
-			# epoch time of the download
-			#strEpochDownload=$(date +"%s")
-			# debug to test strEpochDownload
-			echo ${strEpochDownload}
 			# Adding the message below to the corresponding log file
 			echo "SoftwarePackage - ${strPackage} - ${strEpochDownload}" >> configurationLogs/${ticketID}.log
 
@@ -123,6 +129,7 @@ while [ $intIndex -lt $intLength ]; do
 		# End of the Log file
 		echo "" >> configurationLogs/${ticketID}.log
 		echo "TicketClosed" >> configurationLogs/${ticketID}.log
+		echo "" >> configurationLogs/${ticketID}.log
 
 		strEndDate=$(date +"%d-%b-%Y %R")
 		# debug to test end date
