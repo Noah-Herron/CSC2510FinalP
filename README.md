@@ -5,6 +5,9 @@ Final project in CSC 2510
 ## Description
 `autoGCP.sh`, is a shell script designed to take 3 inputs,#1 the IP address of the Virtual machine you are connecting to, #2 the ticket ID of the process you wan to execute, #3 your username. It will then connect to the Virtual Machine and copy serverSetup.sh to the VM and execute it.
 
+## Important
+- This script was made for the VM to be running Debian 12 (bookworm)
+
 ## Example
 ```bash
 ./AutoGCP.sh <GCP_Server_IP> <Ticket_ID> <Username>
