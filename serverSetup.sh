@@ -1,9 +1,13 @@
 #! /bin/bash
 
-# Description:
+# Description: This script takes 2 inputs IP and ticketID
+# based on the given ticketID the script will parse the JSON using jq, and 
+# install the specified software and execute additional configs.
+# This script also creates a log file that keeps track of all the installs 
+# and configs, and outputs it all to the ticket ID lg file in the configurationLogs directory
+# Example: 12345.log
+# Example Inputs: 34.234.543.23 12345
 #
-#
-
 # Author: Noah Herron
 
 # Creation: 4/27/2024
@@ -14,6 +18,7 @@ gcpIP=$1
 # The ticket ID to be processed
 ticketID=$2
 
+# checking for updates and installing jq
 sudo apt-get update
 sudo apt-get install jq -y
 
@@ -97,6 +102,7 @@ while [ $intIndex -lt $intLength ]; do
 			# debug testing if correctly removed the parenthases
 			#echo $strPackage
 
+			# checking for updates
 			sudo apt-get update
 
 			# epoch time when download starts
@@ -104,6 +110,7 @@ while [ $intIndex -lt $intLength ]; do
 			# debug to test strEpochDownload
 			#echo ${strEpochDownload}
 
+			# installing the specified package
 			sudo apt-get install $strPackage -y
 
 			# Adding the message below to the corresponding log file
@@ -112,11 +119,13 @@ while [ $intIndex -lt $intLength ]; do
 			((intSecIndex++))
 		done
 
+		# reading the configs from the JSON
 		strConfigs=$(echo "$arrResults" | jq -r .[${intIndex}].additionalConfigs)
 		numConfigs=$(echo "$strConfigs" | jq length)
 
 		while [ $intConfigIndex -lt $numConfigs ]; do
 
+			# getting epoch time at the start of the download
 			strEpoch=$(date +"%s")
 			strConfigName=$(echo ${strConfigs} | jq .[${intConfigIndex}].name)
 			# removing the parenthases from th string
@@ -130,6 +139,7 @@ while [ $intIndex -lt $intLength ]; do
 			# debug testing if correctly removed the parenthases
 			#echo $strConfig
 			
+			# getting the path to the specified file, and creating directories to get there if needed
 			if [[ $strConfig == *"touch"* ]]; then
                 strPath=$(echo ${strConfig})
                 strPath=$(echo $(echo ${strPath}) | sed -e 's/touch //')
@@ -137,6 +147,7 @@ while [ $intIndex -lt $intLength ]; do
                 eval $(sudo mkdir -p ${strPath})
             fi
 
+			# executing the specified config command
 			eval $(sudo ${strConfig})
 
 			# Adding the version of each software Package to the log file
