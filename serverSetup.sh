@@ -36,6 +36,8 @@ intIndex=0
 intSecIndex=0
 # third index for while loop version
 intThirIndex=0
+# index for Config Loop
+intConfigIndex=0
 
 # setting the date
 strStartDate=$(date +"%d-%b-%Y %R")
@@ -69,7 +71,6 @@ while [ $intIndex -lt $intLength ]; do
 		#echo ${numPackages}
 
 		strHostName=$(hostname)
-
 
 		# Making the log directory
 		mkdir configurationLogs
@@ -109,6 +110,39 @@ while [ $intIndex -lt $intLength ]; do
 			echo "SoftwarePackage - ${strPackage} - ${strEpochDownload}" >> configurationLogs/${ticketID}.log
 
 			((intSecIndex++))
+		done
+
+		strConfigs=$(echo "$arrResults" | jq -r .[${intIndex}].additionalConfigs)
+		numConfigs=$(echo "$strConfigs" | jq length)
+
+		while [ $intConfigIndex -lt $numConfigs ]; do
+
+			strEpoch=$(date +"%s")
+			strConfigName=$(echo ${strConfigs} | jq .[${intConfigIndex}].name)
+			# removing the parenthases from th string
+			strConfigName=${strConfigName:1:-1}
+			# debug testing if correctly removed the parenthases
+			#echo $strConfigName
+
+			strConfig=$(echo ${strConfigs} | jq .[${intConfigIndex}].config)
+			# removing the parenthases from th string
+			strConfig=${strConfig:1:-1}
+			# debug testing if correctly removed the parenthases
+			#echo $strConfig
+			
+			if [[ $strConfig == *"touch"* ]]; then
+                strPath=$(echo ${strConfig})
+                strPath=$(echo $(echo ${strPath}) | sed -e 's/touch //')
+                strPath=$(echo $(echo ${strPath}) | sed -e 's![^/]*$!!')
+                eval $(sudo mkdir -p ${strPath})
+            fi
+
+			eval $(sudo ${strConfig})
+
+			# Adding the version of each software Package to the log file
+			echo "additionalConfig - ${strConfigName} - ${strEpoch}" >> configurationLogs/${ticketID}.log
+
+			((intConfigIndex++))
 		done
 
 		echo "" >> configurationLogs/${ticketID}.log
