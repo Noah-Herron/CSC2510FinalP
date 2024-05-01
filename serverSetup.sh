@@ -50,9 +50,9 @@ strStartDate=$(date +"%d-%b-%Y %R")
 #echo ${strStartDate}
 
 while [ $intIndex -lt $intLength ]; do
-		intTickID=$(echo ${arrResults} | jq .[${intIndex}].ticketID)
-		# debug to ensure intTickID is correct
-		#echo ${intTickID}
+	intTickID=$(echo ${arrResults} | jq .[${intIndex}].ticketID)
+	# debug to ensure intTickID is correct
+	#echo ${intTickID}
 
 	if [ $intTickID = $ticketID ]; then
 
@@ -183,7 +183,7 @@ while [ $intIndex -lt $intLength ]; do
 
 	fi
 
-		((intIndex++))
+	((intIndex++))
 done
 
 
